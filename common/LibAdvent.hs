@@ -1,0 +1,89 @@
+module LibAdvent
+( split
+, splitOnce
+, (!!!)
+, insertMany
+, unique
+, toCharMatrix
+, Side(East, West, North, South)
+, allSides
+, clockwise
+, counterClockwise
+, shift
+, adjacentCells
+, deleteMany
+, oppositeSide
+, countUnique
+) where
+
+import Data.Array
+import qualified Data.Map as M
+import qualified Data.Set as S
+
+splitOnce :: Eq a => a -> [a] -> ([a], [a])
+splitOnce sep xs = f [] xs
+    where
+        f acc [] = (reverse acc, [])
+        f acc (x:xs)
+            | x == sep = (reverse acc, xs)
+            | otherwise = f (x:acc) xs
+
+split :: Eq a => a -> [a] -> [[a]]
+split sep xs =
+    case splitOnce sep xs of
+         (x, []) -> [x]
+         (x, xs') -> x : split sep xs'
+
+(!!!) :: (Show k, Ord k) => M.Map k v -> k -> v
+m !!! k =
+    case M.lookup k m of
+         Nothing -> error $ "Lookup failed : " ++ show k
+         Just v -> v
+
+insertMany :: (Ord k) => M.Map k v -> [(k, v)] -> M.Map k v
+insertMany = foldl (\m (k, v) -> M.insert k v m)
+
+deleteMany :: (Ord k) => M.Map k v -> [k] -> M.Map k v
+deleteMany = foldl (flip M.delete)
+
+unique :: (Ord a) => [a] -> [a]
+unique = S.toList . S.fromList
+
+countUnique :: (Ord a) => [a] -> Int
+countUnique = S.size . S.fromList
+
+toCharMatrix :: String -> Array (Int, Int) Char
+toCharMatrix contents = listArray bounds elems
+    where
+        rows = lines contents
+        bounds = ((1, 1), (length rows, length $ head rows))
+        elems = concat rows
+
+data Side = East | North | West | South deriving (Eq, Ord, Show)
+
+allSides :: [Side]
+allSides = [East, North, West, South]
+
+shift :: Side -> (Int, Int) -> (Int, Int)
+shift North (r, c) = (r - 1, c)
+shift South (r, c) = (r + 1, c)
+shift West (r, c) = (r, c - 1)
+shift East (r, c) = (r, c + 1)
+
+clockwise :: Side -> Side
+clockwise East = South
+clockwise South = West
+clockwise West = North
+clockwise North = East
+
+counterClockwise :: Side -> Side
+counterClockwise East = North
+counterClockwise North = West
+counterClockwise West = South
+counterClockwise South = East
+
+oppositeSide :: Side -> Side
+oppositeSide = clockwise . clockwise
+
+adjacentCells :: (Int, Int) -> [(Int, Int)]
+adjacentCells c = [shift s c | s <- allSides]
