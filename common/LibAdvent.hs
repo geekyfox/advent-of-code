@@ -14,6 +14,9 @@ module LibAdvent
 , deleteMany
 , oppositeSide
 , countUnique
+, adjacentAvailableCells
+, fixMap
+, parsePair
 ) where
 
 import Data.Array
@@ -86,4 +89,33 @@ oppositeSide :: Side -> Side
 oppositeSide = clockwise . clockwise
 
 adjacentCells :: (Int, Int) -> [(Int, Int)]
-adjacentCells c = [shift s c | s <- allSides]
+adjacentCells cell = [shift side cell | side <- allSides]
+
+adjacentAvailableCells :: Array (Int, Int) Bool -> (Int, Int) -> [(Int, Int)]
+adjacentAvailableCells maze cell = filter isAvailable (adjacentCells cell)
+    where
+        isAvailable (r, c)
+            | (r < rmin) || (r > rmax) = False
+            | (c < cmin) || (c > cmax) = False
+            | otherwise = maze!(r, c)
+        ((rmin, cmin), (rmax, cmax)) = bounds maze
+
+fixMap :: (Show k, Ord k) => (k -> v -> M.Map k v -> [(k, v)]) 
+                          -> M.Map k v -> M.Map k v
+fixMap advance zeroMap = impl zeroMap zeroWave
+    where
+        zeroWave = M.keys zeroMap
+        impl m [] = m
+        impl m (w:ws) =
+            let
+                patches = advance w (m !!! w) m
+                m' = insertMany m patches
+                ws' = ws ++ map fst patches
+            in
+                impl m' ws'
+
+parsePair :: (Read a, Read b) => Char -> String -> (a, b)
+parsePair sep line = (read x, read y)
+    where
+        (x, y) = splitOnce sep line
+
