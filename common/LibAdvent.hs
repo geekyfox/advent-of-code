@@ -1,23 +1,4 @@
-module LibAdvent
-( split
-, splitOnce
-, (!!!)
-, insertMany
-, unique
-, toCharMatrix
-, Side(East, West, North, South)
-, allSides
-, clockwise
-, counterClockwise
-, shift
-, adjacentCells
-, deleteMany
-, oppositeSide
-, countUnique
-, adjacentAvailableCells
-, fixMap
-, parsePair
-) where
+module LibAdvent where
 
 import Data.Array
 import qualified Data.Map as M
@@ -118,4 +99,8 @@ parsePair :: (Read a, Read b) => Char -> String -> (a, b)
 parsePair sep line = (read x, read y)
     where
         (x, y) = splitOnce sep line
+
+one :: (Show a) => [a] -> a
+one [x] = x
+one xs = error $ "Expected exactly one element, got " ++ (show xs)
 
