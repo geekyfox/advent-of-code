@@ -1,5 +1,7 @@
 *
 !2024
 !2024/*.hs
+!common
+!common/*.hs
 !LICENSE
 |README.md

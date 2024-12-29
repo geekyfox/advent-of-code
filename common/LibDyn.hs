@@ -52,6 +52,9 @@ getMany m (k:ks) =
     in
         (v:vs, m3)
 
+evalMany :: (Ord k) => (k -> Meme k v) -> [k] -> [v]
+evalMany f = fst . getMany (wrap f)
+
 resolve :: (Ord k) => Memo k v -> Result k v w -> (w, Memo k v)
 resolve m (Now w) = (w, m)
 resolve m (Later k f) =
