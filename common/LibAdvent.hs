@@ -69,6 +69,12 @@ counterClockwise South = East
 oppositeSide :: Side -> Side
 oppositeSide = clockwise . clockwise
 
+charToSide :: Char -> Side
+charToSide '^' = North
+charToSide 'v' = South
+charToSide '<' = West
+charToSide '>' = East
+
 adjacentCells :: (Int, Int) -> [(Int, Int)]
 adjacentCells cell = [shift side cell | side <- allSides]
 

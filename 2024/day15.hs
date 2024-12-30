@@ -1,6 +1,7 @@
-import qualified Data.Map as M;
-import Prelude hiding (Left, Right);
-import Data.Maybe;
+import qualified Data.Map as M
+import Data.Maybe
+
+import LibAdvent
 
 main :: IO ()
 main = do
@@ -11,8 +12,8 @@ main = do
     putStrLn $ "Part two : " ++ show (solve puzzle)
 
 type Place = (Int, Int)
-data Item = Wall | Box | Empty | Robot | LeftHalf | RightHalf deriving (Show, Eq)
-data Side = Up | Down | Left | Right deriving Show
+data Item = Wall | Box | Empty | Robot | LeftHalf | RightHalf
+    deriving (Show, Eq)
 type Map = M.Map Place Item
 type Puzzle = (Map, Place, [Side])
 
@@ -37,46 +38,36 @@ charToItem '[' = LeftHalf
 charToItem ']' = RightHalf
 charToItem x = error $ "Don't know how to charToItem " ++ [x]
 
-charToSide :: Char -> Side
-charToSide '^' = Up
-charToSide 'v' = Down
-charToSide '<' = Left
-charToSide '>' = Right
-
-shift :: Side -> Place -> Place
-shift Up (r, c) = (r - 1, c)
-shift Down (r, c) = (r + 1, c)
-shift Left (r, c) = (r, c - 1)
-shift Right (r, c) = (r, c + 1)
-
 push :: Place -> Side -> Map -> Maybe Map
-push p s m =
-    case (get pp, s) of
+push from dir map =
+    case (map !!! to, dir) of
          (Wall, _) -> Nothing
-         (Empty, _) -> Just $ set m [(p, Empty), (pp, get p)]
-         (Box, _) -> mm >>= retry
-         (_, Left) -> mm >>= retry
-         (_, Right) -> mm >>= retry
-         (LeftHalf, _) -> mm >>= push (shift Right pp) s >>= retry
-         (RightHalf, _) -> mm >>= push (shift Left pp) s >>= retry
+         (Empty, _) -> Just swap
+         (Box, _) -> map2 >>= retry
+         (_, West) -> map2 >>= retry
+         (_, East) -> map2 >>= retry
+         (LeftHalf, _) -> map2 >>= push (shift East to) dir >>= retry
+         (RightHalf, _) -> map2 >>= push (shift West to) dir >>= retry
     where
-        get ix = fromJust $ M.lookup ix m
-        set x [] = x
-        set x ((ix, v):xs) = set (M.insert ix v x) xs
-        pp = shift s p
-        mm = push pp s m
-        retry = push p s
+        swap = insertMany map [(from, map !!! to), (to, map !!! from)]
+        to = shift dir from
+        map2 = push to dir map
+        retry = push from dir
+
+pushMany :: Map -> Place -> [Side] -> Map
+pushMany map _ [] = map
+pushMany map robot (dir:dirs) =
+    case push robot dir map of
+         Just map2 -> pushMany map2 (shift dir robot) dirs
+         Nothing -> pushMany map robot dirs
 
 solve :: Puzzle -> Int
-solve (theMap, robot, moves) = 
-    sum [ (r-1) * 100 + (c - 1) |
-          ((r,c), x) <- M.assocs finalMap,
-          x == Box || x == LeftHalf ]
+solve (theMap, robot, moves) = sum indices
     where
-        finalMap = fst $ foldl next (theMap, robot) moves
-        next (m, p) s = case push p s m of
-                             Just mm -> (mm, shift s p)
-                             Nothing -> (m, p)
+        indices = [ index | ((r,c), x) <- M.assocs finalMap,
+                            x == Box || x == LeftHalf,
+                            let index = (r - 1) * 100 + (c - 1) ]
+        finalMap = pushMany theMap robot moves
 
 explode :: String -> String
 explode contents = unlines $ map explodeLine mapLines ++ movesLines
