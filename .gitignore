@@ -3,6 +3,8 @@
 !2015/*.hs
 !2024
 !2024/*.hs
+!2025
+!2025/*.hs
 !common
 !common/*.hs
 !LICENSE
