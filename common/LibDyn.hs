@@ -52,6 +52,9 @@ getMany m (k:ks) =
     in
         (v:vs, m3)
 
+eval :: (Ord k) => (k -> Meme k v) -> k -> v
+eval f = fst . get (wrap f)
+
 evalMany :: (Ord k) => (k -> Meme k v) -> [k] -> [v]
 evalMany f = fst . getMany (wrap f)
 

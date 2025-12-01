@@ -108,5 +108,15 @@ parsePair sep line = (read x, read y)
 
 one :: (Show a) => [a] -> a
 one [x] = x
-one xs = error $ "Expected exactly one element, got " ++ (show xs)
+one xs = error $ "Expected exactly one element, got " ++ show xs
+
+permutations :: [a] -> [[a]]
+permutations = foldr (concatMap . interject) [[]]
+
+interject :: a -> [a] -> [[a]]
+interject x = scan []
+    where
+        scan acc [] = [reverse (x:acc)]
+        scan acc (y:ys) = pack acc (y:ys) : scan (y:acc) ys
+        pack xs ys = reverse (x:xs) ++ ys
 

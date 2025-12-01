@@ -19,9 +19,14 @@ enough commitment by itself, without an additional handicap of DYI-ing
 containers and hunting segfaults, although I might still re-solve them
 all in C at a later time.
 
-2. **Vanilla GHC, no third-party packages.**
+2. **Vanilla GHC with a minimum of third-party packages.**
 
-No need to explain here.
+I mean, how much do I need to explain here? This is an exercise in
+coding, not in sifting through the package repository until I find
+something that's half-decent for my problem.
+
+Allowed exceptions would be things that are in standard library in
+Python, e.g. MD5 hashing or JSON parsing.
    
 3. ***"Works for my dataset."***
 
