@@ -1,5 +1,4 @@
 import LibAdvent (split, splitOnce, unique)
-import Data.List (sort)
 
 main :: IO ()
 main = do
