@@ -26,7 +26,7 @@ rotateImpl st (ch:chs) = (nd == 0, z):(rotateImpl nd chs)
 
 rotateOne :: Int -> Int -> (Int, Int)
 rotateOne st ch
-    | (st + ch) > 0  = ((st + ch) `mod` 100, (st + ch) `div` 100)
+    | (st + ch) > 0 = ((st + ch) `mod` 100, (st + ch) `div` 100)
     | (st + ch) == 0 = (0, 1)
     | st == 0 = rotateOne 100 ch
     | otherwise = (nd, z + 1)
