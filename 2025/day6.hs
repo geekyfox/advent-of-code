@@ -19,7 +19,7 @@ parse txt = slice (last xs) (init xs)
 
 slice :: String -> [String] -> Puzzle
 slice "" _ = []
-slice os xs = (o, ys):(slice os' xs')
+slice os xs = (o, ys) : slice os' xs'
     where
         (o, os', n) = trim os
         ys  = map (take n) xs
@@ -41,9 +41,8 @@ solvePartOne = sum . map (uncurry f)
 solvePartTwo :: Puzzle -> Integer
 solvePartTwo = solvePartOne . map f
     where
-        f (op, ns) = (op, g $ transpose ns)
-        g = catMaybes . map h
-        h "" = Nothing
-        h (' ':xs) = h xs
-        h xs = Just xs
+        f (op, ns) = (op, mapMaybe g $ transpose ns)
+        g "" = Nothing
+        g (' ':xs) = g xs
+        g xs = Just xs
 
